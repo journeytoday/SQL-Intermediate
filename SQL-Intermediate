@@ -1,0 +1,253 @@
+-- Create a table for customers
+CREATE TABLE customers (
+    customer_id INT,
+    customer_name VARCHAR(100),
+    email VARCHAR(100),
+    city VARCHAR(50),
+    country VARCHAR(50)
+);
+
+-- Insert data into the customers table
+INSERT INTO customers (customer_id, customer_name, email, city, country)
+VALUES (1, 'John Smith', 'john@example.com', 'New York', 'USA'),
+       (2, 'Jane Doe', 'jane@example.com', 'London', 'UK');
+
+-- Create a table for orders
+CREATE TABLE orders (
+    order_id INT,
+    order_total DECIMAL(10, 2),
+    customer_id INT
+);
+
+-- Insert data into the orders table
+INSERT INTO orders (order_id, order_total, customer_id)
+VALUES (101, 150.00, 1),
+       (102, 250.00, 2);
+
+-- Perform different intermediate SQL operations on the dummy database
+
+-- JOINS (INNER, LEFT, RIGHT, FULL)
+SELECT c.customer_name, o.order_id, o.order_total
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id; -- INNER JOIN
+
+SELECT c.customer_name, o.order_id, o.order_total
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id; -- LEFT JOIN
+
+SELECT c.customer_name, o.order_id, o.order_total
+FROM customers c
+RIGHT JOIN orders o ON c.customer_id = o.customer_id; -- RIGHT JOIN
+
+SELECT c.customer_name, o.order_id, o.order_total
+FROM customers c
+FULL JOIN orders o ON c.customer_id = o.customer_id; -- FULL JOIN
+
+-- UNION Operator
+SELECT customer_name, email
+FROM customers
+UNION
+SELECT customer_name, email
+FROM orders;
+
+-- SUB QUERIES
+SELECT customer_name
+FROM customers
+WHERE customer_id IN (
+    SELECT customer_id
+    FROM orders
+    WHERE order_total > 200.00
+);
+
+-- EXISTS Operator
+SELECT customer_name
+FROM customers c
+WHERE EXISTS (
+    SELECT *
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+    AND o.order_total > 200.00
+);
+
+-- ANY/SOME and ALL Operators
+SELECT customer_name
+FROM customers
+WHERE customer_id = ANY (
+    SELECT customer_id
+    FROM orders
+    WHERE order_total > 200.00
+);
+
+SELECT customer_name
+FROM customers
+WHERE customer_id = ALL (
+    SELECT customer_id
+    FROM orders
+    WHERE order_total > 200.00
+);
+
+-- IN Operator
+SELECT customer_name
+FROM customers
+WHERE customer_id IN (
+    SELECT customer_id
+    FROM orders
+    WHERE order_total > 200.00
+);
+
+-- BETWEEN Operator
+SELECT customer_name
+FROM customers
+WHERE customer_id BETWEEN 1 AND 2;
+
+-- Aliases
+SELECT c.customer_name AS name, o.order_total AS total
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id;
+
+-- Views
+CREATE VIEW customer_orders AS
+SELECT c.customer_name, o.order_total
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id;
+
+SELECT customer_name, order_total
+FROM customer_orders;
+
+-- Indexes
+CREATE INDEX idx_orders_customer_id ON orders(customer_id);
+
+SELECT customer_name
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+WHERE o.customer_id = 1;
+
+-- Constraints (NOT NULL, UNIQUE, PRIMARY KEY, FOREIGN KEY)
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    city VARCHAR(50),
+country VARCHAR(50)
+);
+
+CREATE TABLE orders (
+order_id INT PRIMARY KEY,
+order_total DECIMAL(10, 2),
+customer_id INT,
+FOREIGN KEY (customer_id) REFERENCES customers (customer_id)
+);
+
+-- Perform different intermediate SQL operations on the dummy database
+
+-- JOINS (INNER, LEFT, RIGHT, FULL)
+SELECT c.customer_name, o.order_id, o.order_total
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id; -- INNER JOIN
+
+SELECT c.customer_name, o.order_id, o.order_total
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id; -- LEFT JOIN
+
+SELECT c.customer_name, o.order_id, o.order_total
+FROM customers c
+RIGHT JOIN orders o ON c.customer_id = o.customer_id; -- RIGHT JOIN
+
+SELECT c.customer_name, o.order_id, o.order_total
+FROM customers c
+FULL JOIN orders o ON c.customer_id = o.customer_id; -- FULL JOIN
+
+-- UNION Operator
+SELECT customer_name, email
+FROM customers
+UNION
+SELECT customer_name, email
+FROM orders;
+
+-- SUB QUERIES
+SELECT customer_name
+FROM customers
+WHERE customer_id IN (
+SELECT customer_id
+FROM orders
+WHERE order_total > 200.00
+);
+
+-- EXISTS Operator
+SELECT customer_name
+FROM customers c
+WHERE EXISTS (
+SELECT *
+FROM orders o
+WHERE o.customer_id = c.customer_id
+AND o.order_total > 200.00
+);
+
+-- ANY/SOME and ALL Operators
+SELECT customer_name
+FROM customers
+WHERE customer_id = ANY (
+SELECT customer_id
+FROM orders
+WHERE order_total > 200.00
+);
+
+SELECT customer_name
+FROM customers
+WHERE customer_id = ALL (
+SELECT customer_id
+FROM orders
+WHERE order_total > 200.00
+);
+
+-- IN Operator
+SELECT customer_name
+FROM customers
+WHERE customer_id IN (
+SELECT customer_id
+FROM orders
+WHERE order_total > 200.00
+);
+
+-- BETWEEN Operator
+SELECT customer_name
+FROM customers
+WHERE customer_id BETWEEN 1 AND 2;
+
+-- Aliases
+SELECT c.customer_name AS name, o.order_total AS total
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id;
+
+-- Views
+CREATE VIEW customer_orders AS
+SELECT c.customer_name, o.order_total
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id;
+
+SELECT customer_name, order_total
+FROM customer_orders;
+
+-- Indexes
+CREATE INDEX idx_orders_customer_id ON orders(customer_id);
+
+SELECT customer_name
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+WHERE o.customer_id = 1;
+
+-- Constraints (NOT NULL, UNIQUE, PRIMARY KEY, FOREIGN KEY)
+CREATE TABLE customers (
+customer_id INT PRIMARY KEY,
+customer_name VARCHAR(100) NOT NULL,
+email VARCHAR(100) UNIQUE,
+city VARCHAR(50),
+country VARCHAR(50)
+);
+
+CREATE TABLE orders (
+order_id INT PRIMARY KEY,
+order_total DECIMAL(10, 2),
+customer_id INT,
+FOREIGN KEY (customer_id) REFERENCES customers (customer_id)
+);
