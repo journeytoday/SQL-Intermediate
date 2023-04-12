@@ -1,45 +1,44 @@
-SQL Intermediate Operations on Dummy Database
-This project demonstrates various intermediate SQL operations on a dummy database consisting of two tables: "customers" and "orders". The "customers" table contains information about customers such as customer_id, customer_name, email, city, and country. The "orders" table contains information about orders such as order_id, order_total, and customer_id.
+# Employee Management System
 
-Table Creation and Data Insertion
-The project starts with the creation of tables using SQL "CREATE TABLE" statements, followed by inserting dummy data into the tables using "INSERT INTO" statements.
+This is an Employee Management System that uses a MySQL database to store employee information such as employee ID, name, salary, department, and manager. It provides various functionalities to manage employees, such as adding new employees, updating employee information, retrieving employee insights, and managing employee hierarchy.
 
-Intermediate SQL Operations
-The project demonstrates the following intermediate SQL operations on the dummy database:
+## Features
 
-JOINS (INNER, LEFT, RIGHT, FULL): Demonstrates how to perform inner join, left join, right join, and full join between the "customers" and "orders" tables.
+- Add new employees with their details such as employee ID, name, salary, department, and manager.
+- Update employee information such as salary, department, and manager.
+- Retrieve various employee insights, such as department-wise average salary, total number of employees in each department, highest salaried employees, lowest salaried employees, employees with the same manager, employees without a manager, and employees with at least one reportee.
+- Manage employee hierarchy by tracking the manager for each employee.
 
-UNION Operator: Demonstrates how to use the UNION operator to combine the results of two SELECT statements.
+## Technologies Used
 
-SUB QUERIES: Demonstrates how to use subqueries to filter data from the "customers" table based on data from the "orders" table.
+- MySQL: An open-source relational database management system used to store and manage employee data.
+- SQL: A standard programming language used to communicate with relational databases and perform operations such as inserting, updating, retrieving, and deleting data.
 
-EXISTS Operator: Demonstrates how to use the EXISTS operator to filter data from the "customers" table based on the existence of related data in the "orders" table.
+## Prerequisites
 
-ANY/SOME and ALL Operators: Demonstrates how to use the ANY/SOME and ALL operators to compare a value with a set of values from the "orders" table.
+- MySQL: Install MySQL on your local machine or have access to a MySQL database server.
 
-IN Operator: Demonstrates how to use the IN operator to filter data from the "customers" table based on a set of values from the "orders" table.
+## Getting Started
 
-BETWEEN Operator: Demonstrates how to use the BETWEEN operator to filter data from the "customers" table based on a range of values.
+1. Clone the repository: `git clone https://github.com/journeytoday/SQL-Intermediate.git`
+2. Create a MySQL database and import the provided SQL schema to set up the required tables. You can use any MySQL client, such as MySQL Workbench or phpMyAdmin, to import the schema.
+## Usage
 
-Aliases: Demonstrates how to use aliases to assign temporary names to columns or tables for ease of reference.
+- Add a new employee: Use the `add_employee()` function to add a new employee by providing the employee details such as ID, name, salary, department, and manager.
+- Update employee information: Use the `update_employee()` function to update employee information such as salary, department, and manager by providing the employee ID and the new details.
+- Retrieve employee insights: Use the various SQL queries provided in the project to retrieve employee insights such as department-wise average salary, total number of employees in each department, highest salaried employees, lowest salaried employees, employees with the same manager, employees without a manager, and employees with at least one reportee.
+- Manage employee hierarchy: The application automatically tracks the manager for each employee based on the manager ID provided during employee addition or update.
 
-Views: Demonstrates how to create and use views to simplify complex queries and provide a virtual representation of the data.
+## License
 
-Indexes: Demonstrates how to create and use indexes to improve the performance of database queries.
+This project is licensed under the [MIT License](LICENSE).
 
-Constraints (NOT NULL, UNIQUE, PRIMARY KEY, FOREIGN KEY): Demonstrates how to use constraints to enforce data integrity rules on the tables, such as enforcing the uniqueness of values, defining primary and foreign keys, and ensuring that certain columns cannot contain NULL values.
+## Contributing
 
-Usage
-Clone the repository.
-Run the SQL script on your SQL server to create and populate the dummy database.
-Use the SQL statements in the script to perform various intermediate SQL operations on the dummy database.
-Note: Make sure to adjust the SQL statements according to the syntax and rules of the SQL server you are using.
+If you would like to contribute to this project, please open an issue or submit a pull request. We welcome contributions from the community!
 
-Contribution
-Contributions to this project are welcome! Feel free to submit issues, suggest improvements, or add new features.
+## Contact
 
-License
-This project is released under the MIT License.
+For any questions or inquiries, please contact us at thejourneystoday@gmail.com
 
-Contact
-For any questions or inquiries, please contact me at thejourneystoday@gmail.com
+Happy Employee Management!
