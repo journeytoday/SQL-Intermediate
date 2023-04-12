@@ -1,253 +1,181 @@
--- Create a table for customers
-CREATE TABLE customers (
-    customer_id INT,
-    customer_name VARCHAR(100),
-    email VARCHAR(100),
-    city VARCHAR(50),
-    country VARCHAR(50)
+-- Create the 'employees' table
+CREATE TABLE employees (
+  emp_id INT PRIMARY KEY,
+  emp_name VARCHAR(100),
+  emp_salary DECIMAL(10, 2),
+  emp_department VARCHAR(50),
+  emp_manager_id INT
 );
 
--- Insert data into the customers table
-INSERT INTO customers (customer_id, customer_name, email, city, country)
-VALUES (1, 'John Smith', 'john@example.com', 'New York', 'USA'),
-       (2, 'Jane Doe', 'jane@example.com', 'London', 'UK');
+-- Insert sample data into the 'employees' table
+INSERT INTO employees (emp_id, emp_name, emp_salary, emp_department, emp_manager_id)
+VALUES (1, 'Alice Smith', 5000.00, 'HR', 5),
+       (2, 'Bob Johnson', 6000.00, 'Finance', 5),
+       (3, 'Charlie Brown', 4500.00, 'IT', 6),
+       (4, 'David Lee', 5500.00, 'Finance', 6),
+       (5, 'Eva Chen', 7000.00, 'HR', NULL),
+       (6, 'Frank Adams', 8000.00, 'IT', 5),
+       (7, 'Grace Kim', 6500.00, 'HR', 5),
+       (8, 'Henry Liu', 7500.00, 'Finance', 6);
 
--- Create a table for orders
-CREATE TABLE orders (
-    order_id INT,
-    order_total DECIMAL(10, 2),
-    customer_id INT
+-- Create the 'departments' table
+CREATE TABLE departments (
+  dept_id INT PRIMARY KEY,
+  dept_name VARCHAR(50),
+  dept_location VARCHAR(100)
 );
 
--- Insert data into the orders table
-INSERT INTO orders (order_id, order_total, customer_id)
-VALUES (101, 150.00, 1),
-       (102, 250.00, 2);
+-- Insert sample data into the 'departments' table
+INSERT INTO departments (dept_id, dept_name, dept_location)
+VALUES (1, 'HR', 'New York'),
+       (2, 'Finance', 'Los Angeles'),
+       (3, 'IT', 'San Francisco');
 
--- Perform different intermediate SQL operations on the dummy database
+-- Create a view for the 'employees' table with an alias
+CREATE VIEW emp_view AS
+SELECT emp_id, emp_name, emp_salary, emp_department, emp_manager_id
+FROM employees;
 
--- JOINS (INNER, LEFT, RIGHT, FULL)
-SELECT c.customer_name, o.order_id, o.order_total
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id; -- INNER JOIN
+-- Create an index on the 'emp_salary' column of the 'employees' table for faster querying
+CREATE INDEX idx_emp_salary ON employees (emp_salary);
 
-SELECT c.customer_name, o.order_id, o.order_total
-FROM customers c
-LEFT JOIN orders o ON c.customer_id = o.customer_id; -- LEFT JOIN
+-- Create a constraint on the 'emp_department' column of the 'employees' table to ensure it is not NULL
+ALTER TABLE employees
+ADD CONSTRAINT chk_emp_department_not_null CHECK (emp_department IS NOT NULL);
 
-SELECT c.customer_name, o.order_id, o.order_total
-FROM customers c
-RIGHT JOIN orders o ON c.customer_id = o.customer_id; -- RIGHT JOIN
+-- Create a constraint on the 'emp_id' column of the 'employees' table to ensure it is unique
+ALTER TABLE employees
+ADD CONSTRAINT uc_emp_id UNIQUE (emp_id);
 
-SELECT c.customer_name, o.order_id, o.order_total
-FROM customers c
-FULL JOIN orders o ON c.customer_id = o.customer_id; -- FULL JOIN
+-- Create a constraint on the 'dept_id' column of the 'departments' table to ensure it is unique
+ALTER TABLE departments
+ADD CONSTRAINT uc_dept_id UNIQUE (dept_id);
 
--- UNION Operator
-SELECT customer_name, email
-FROM customers
-UNION
-SELECT customer_name, email
-FROM orders;
+-- Create a constraint on the 'dept_name' column of the 'departments' table to ensure it is not NULL
+ALTER TABLE departments
+MODIFY COLUMN dept_name VARCHAR(50) NOT NULL;
 
--- SUB QUERIES
-SELECT customer_name
-FROM customers
-WHERE customer_id IN (
-    SELECT customer_id
-    FROM orders
-    WHERE order_total > 200.00
-);
+-- Create a foreign key constraint on the 'emp_manager_id' column of the 'employees' table
+ALTER TABLE employees
+ADD CONSTRAINT fk_emp_manager_id FOREIGN KEY (emp_manager_id) REFERENCES employees(emp_id);
 
--- EXISTS Operator
-SELECT customer_name
-FROM customers c
-WHERE EXISTS (
-    SELECT *
-    FROM orders o
-    WHERE o.customer_id = c.customer_id
-    AND o.order_total > 200.00
-);
+-- Perform a JOIN operation to retrieve employee details along with their department information
+SELECT emp_view.emp_id, emp_view.emp_name, emp_view.emp_salary, departments.dept_name, departments.dept_location
+FROM emp_view
+JOIN departments ON emp_view.emp_department = departments.dept_name;
 
--- ANY/SOME and ALL Operators
-SELECT customer_name
-FROM customers
-WHERE customer_id = ANY (
-    SELECT customer_id
-    FROM orders
-    WHERE order_total > 200.00
-);
+-- Perform a LEFT JOIN operation to retrieve all employees along with their department information, including employees with NULL department
+SELECT emp_view.emp_id, emp_view.emp_name, emp_view.emp_salary, departments.dept_name, departments.dept_location
+FROM emp_view
+LEFT JOIN departments ON emp_view.emp_department = departments.dept_name;
 
-SELECT customer_name
-FROM customers
-WHERE customer_id = ALL (
-    SELECT customer_id
-    FROM orders
-    WHERE order_total > 200.00
-);
+-- Perform a RIGHT JOIN operation to retrieve all departments along with their employees information, including departments with no employees
+SELECT departments.dept_id, departments.dept_name, departments.dept_location, emp_view.emp_id, emp_view.emp_name, emp_view.emp_salary
+FROM departments
+RIGHT JOIN emp_view ON emp_view.emp_department = departments.dept_name;
 
--- IN Operator
-SELECT customer_name
-FROM customers
-WHERE customer_id IN (
-    SELECT customer_id
-    FROM orders
-    WHERE order_total > 200.00
-);
+-- Perform an INNER JOIN operation to retrieve employees who have managers along with their manager's information
+SELECT e.emp_id, e.emp_name, e.emp_salary, e.emp_department, e.emp_manager_id, m.emp_name as manager_name, m.emp_department as manager_department
+FROM employees e
+JOIN employees m ON e.emp_manager_id = m.emp_id;
 
--- BETWEEN Operator
-SELECT customer_name
-FROM customers
-WHERE customer_id BETWEEN 1 AND 2;
+-- Perform a GROUP BY operation to retrieve department-wise average salary and total number of employees
+SELECT emp_department, AVG(emp_salary) as avg_salary, COUNT(*) as total_employees
+FROM employees
+GROUP BY emp_department;
 
--- Aliases
-SELECT c.customer_name AS name, o.order_total AS total
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id;
+-- Perform an ORDER BY operation to retrieve employees sorted by salary in descending order
+SELECT emp_id, emp_name, emp_salary, emp_department
+FROM employees
+ORDER BY emp_salary DESC;
 
--- Views
-CREATE VIEW customer_orders AS
-SELECT c.customer_name, o.order_total
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id;
+-- Perform a LIMIT operation to retrieve the top 5 highest salaried employees
+SELECT emp_id, emp_name, emp_salary, emp_department
+FROM employees
+ORDER BY emp_salary DESC
+LIMIT 5;
 
-SELECT customer_name, order_total
-FROM customer_orders;
+-- Perform an UPDATE operation to increase the salary of all employees in the 'Finance' department by 10%
+UPDATE employees
+SET emp_salary = emp_salary * 1.10
+WHERE emp_department = 'Finance';
 
--- Indexes
-CREATE INDEX idx_orders_customer_id ON orders(customer_id);
+-- Perform a DELETE operation to remove all employees with NULL department
+DELETE FROM employees
+WHERE emp_department IS NULL;
 
-SELECT customer_name
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-WHERE o.customer_id = 1;
+-- Retrieve the department-wise average salary and total number of employees
+SELECT emp_department, AVG(emp_salary) as avg_salary, COUNT(*) as total_employees
+FROM employees
+GROUP BY emp_department;
 
--- Constraints (NOT NULL, UNIQUE, PRIMARY KEY, FOREIGN KEY)
-CREATE TABLE customers (
-    customer_id INT PRIMARY KEY,
-    customer_name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE,
-    city VARCHAR(50),
-country VARCHAR(50)
-);
+-- Retrieve the top 5 highest salaried employees
+SELECT emp_id, emp_name, emp_salary, emp_department
+FROM employees
+ORDER BY emp_salary DESC
+LIMIT 5;
 
-CREATE TABLE orders (
-order_id INT PRIMARY KEY,
-order_total DECIMAL(10, 2),
-customer_id INT,
-FOREIGN KEY (customer_id) REFERENCES customers (customer_id)
-);
+-- Retrieve the department-wise employee count and total salary
+SELECT emp_department, COUNT(*) as total_employees, SUM(emp_salary) as total_salary
+FROM employees
+GROUP BY emp_department;
 
--- Perform different intermediate SQL operations on the dummy database
+-- Retrieve the employee with the highest salary
+SELECT emp_id, emp_name, emp_salary, emp_department
+FROM employees
+ORDER BY emp_salary DESC
+LIMIT 1;
 
--- JOINS (INNER, LEFT, RIGHT, FULL)
-SELECT c.customer_name, o.order_id, o.order_total
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id; -- INNER JOIN
+-- Retrieve the employee with the lowest salary
+SELECT emp_id, emp_name, emp_salary, emp_department
+FROM employees
+ORDER BY emp_salary ASC
+LIMIT 1;
 
-SELECT c.customer_name, o.order_id, o.order_total
-FROM customers c
-LEFT JOIN orders o ON c.customer_id = o.customer_id; -- LEFT JOIN
+-- Retrieve the average salary of all employees
+SELECT AVG(emp_salary) as avg_salary
+FROM employees;
 
-SELECT c.customer_name, o.order_id, o.order_total
-FROM customers c
-RIGHT JOIN orders o ON c.customer_id = o.customer_id; -- RIGHT JOIN
+-- Retrieve the total salary of all employees
+SELECT SUM(emp_salary) as total_salary
+FROM employees;
 
-SELECT c.customer_name, o.order_id, o.order_total
-FROM customers c
-FULL JOIN orders o ON c.customer_id = o.customer_id; -- FULL JOIN
+-- Retrieve the department-wise employee count
+SELECT emp_department, COUNT(*) as total_employees
+FROM employees
+GROUP BY emp_department;
 
--- UNION Operator
-SELECT customer_name, email
-FROM customers
-UNION
-SELECT customer_name, email
-FROM orders;
+-- Retrieve the employees who have the highest salary in their respective department
+SELECT e.emp_id, e.emp_name, e.emp_salary, e.emp_department
+FROM employees e
+JOIN (
+SELECT emp_department, MAX(emp_salary) as max_salary
+FROM employees
+GROUP BY emp_department
+) AS max_salary_per_dept ON e.emp_department = max_salary_per_dept.emp_department AND e.emp_salary = max_salary_per_dept.max_salary;
 
--- SUB QUERIES
-SELECT customer_name
-FROM customers
-WHERE customer_id IN (
-SELECT customer_id
-FROM orders
-WHERE order_total > 200.00
-);
+-- Retrieve the employees who have the lowest salary in their respective department
+SELECT e.emp_id, e.emp_name, e.emp_salary, e.emp_department
+FROM employees e
+JOIN (
+SELECT emp_department, MIN(emp_salary) as min_salary
+FROM employees
+GROUP BY emp_department
+) AS min_salary_per_dept ON e.emp_department = min_salary_per_dept.emp_department AND e.emp_salary = min_salary_per_dept.min_salary;
 
--- EXISTS Operator
-SELECT customer_name
-FROM customers c
-WHERE EXISTS (
-SELECT *
-FROM orders o
-WHERE o.customer_id = c.customer_id
-AND o.order_total > 200.00
-);
+-- Retrieve the employees who have the same manager
+SELECT e1.emp_id, e1.emp_name, e1.emp_salary, e1.emp_department, e1.emp_manager_id, e2.emp_id as manager_emp_id, e2.emp_name as manager_emp_name
+FROM employees e1
+JOIN employees e2 ON e1.emp_manager_id = e2.emp_id
+ORDER BY e1.emp_manager_id;
 
--- ANY/SOME and ALL Operators
-SELECT customer_name
-FROM customers
-WHERE customer_id = ANY (
-SELECT customer_id
-FROM orders
-WHERE order_total > 200.00
-);
+-- Retrieve the employees who do not have any manager
+SELECT emp_id, emp_name, emp_salary, emp_department
+FROM employees
+WHERE emp_manager_id IS NULL;
 
-SELECT customer_name
-FROM customers
-WHERE customer_id = ALL (
-SELECT customer_id
-FROM orders
-WHERE order_total > 200.00
-);
-
--- IN Operator
-SELECT customer_name
-FROM customers
-WHERE customer_id IN (
-SELECT customer_id
-FROM orders
-WHERE order_total > 200.00
-);
-
--- BETWEEN Operator
-SELECT customer_name
-FROM customers
-WHERE customer_id BETWEEN 1 AND 2;
-
--- Aliases
-SELECT c.customer_name AS name, o.order_total AS total
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id;
-
--- Views
-CREATE VIEW customer_orders AS
-SELECT c.customer_name, o.order_total
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id;
-
-SELECT customer_name, order_total
-FROM customer_orders;
-
--- Indexes
-CREATE INDEX idx_orders_customer_id ON orders(customer_id);
-
-SELECT customer_name
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-WHERE o.customer_id = 1;
-
--- Constraints (NOT NULL, UNIQUE, PRIMARY KEY, FOREIGN KEY)
-CREATE TABLE customers (
-customer_id INT PRIMARY KEY,
-customer_name VARCHAR(100) NOT NULL,
-email VARCHAR(100) UNIQUE,
-city VARCHAR(50),
-country VARCHAR(50)
-);
-
-CREATE TABLE orders (
-order_id INT PRIMARY KEY,
-order_total DECIMAL(10, 2),
-customer_id INT,
-FOREIGN KEY (customer_id) REFERENCES customers (customer_id)
-);
+-- Retrieve the employees who have at least one employee reporting to them
+SELECT e1.emp_id, e1.emp_name, e1.emp_salary, e1.emp_department, e2.emp_id as reportee_emp_id, e2.emp_name as reportee_emp_name
+FROM employees e1
+JOIN employees e2 ON e1.emp_id = e2.emp_manager_id
+ORDER BY e1.emp_id;
